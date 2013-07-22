@@ -1,3 +1,8 @@
+%{
+typedef enum {NONE, ID, OPEN_TAG_OPEN, OPEN_TAG_CLOSE, CLOSE_TAG_NONEMPTY, CLOSE_TAG_EMPTY, OPEN_SCRIPTLET, OPEN_EXPRESSION, OPEN_DIRECTIVE, OPEN_DECLARATION, CLOSE_JSP, SCOPE} token;
+char *token_to_string[] = {"NONE", "ID", "OPEN_TAG_OPEN", "OPEN_TAG_CLOSE", "CLOSE_TAG_NONEMPTY", "CLOSE_TAG_EMPTY", "OPEN_SCRIPTLET", "OPEN_EXPRESSION", "OPEN_DIRECTIVE", "OPEN_DECLARATION", "CLOSE_JSP", "SCOPE"};
+%}
+
 %option noyywrap
 
 delim	[ \t\n]
@@ -8,7 +13,6 @@ id	({letter}|_)({letter}|{digit}|_)*
 
 %%
 
-{ws}
 {id}	{return ID;}
 "<"	{return OPEN_TAG_OPEN;}
 "</"	{return OPEN_TAG_CLOSE;}
@@ -20,6 +24,7 @@ id	({letter}|_)({letter}|{digit}|_)*
 "<%@"	{return OPEN_DIRECTIVE;}
 "<%!"	{return OPEN_DECLARATION;}
 ":"	{return SCOPE;}
+.	{ECHO;}
 
 %%
 
@@ -27,21 +32,7 @@ int main()
 {
 	token next;
 	while (next = yylex()) {
-		printf("%s: ", relop_to_name[next]);
-		switch (next) {
-			case RELOP:
-				printf("%s\n", relop_to_name[yylval.l]);
-			break;
-			case NUMBER:
-				printf("%lf\n", yylval.d);
-			break;
-			case ID:
-				printf("%s\n", yytext);
-			break;
-			default:
-				printf("\n");
-			break;
-		}
+		printf("[%s: \"%s\"]", token_to_string[next], yytext);
 	}
 	return 0;
 }
